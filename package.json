@@ -1,21 +1,13 @@
 {
-  "name": "taskmanager",
-  "version": "1.0.0",
-  "description": "",
+  "name": "taskManager",
+  "version": "2.0.0",
+  "description": "Task Manager with Categories & Status",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sodiumcodes/taskManager.git"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/sodiumcodes/taskManager/issues"
-  },
-  "homepage": "https://github.com/sodiumcodes/taskManager#readme"
+  "type": "module"
 }
