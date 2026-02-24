@@ -35,7 +35,7 @@
         document.getElementById("addBtn").addEventListener("click", function(){
             const taskEnter = document.getElementById("taskEnter");
             const taskText = taskEnter.value; 
-            if (taskText === "") return;
+            if (taskText === "") return ;
             const li = document.createElement("li");
             li.className = "list-unstyled my-1 text-white border border-1 border-light rounded p-1 list-items d-flex justify-content-between"
             li.textContent = taskText;
