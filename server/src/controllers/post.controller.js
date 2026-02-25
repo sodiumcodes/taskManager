@@ -2,7 +2,22 @@ const taskModel = require("../../models/task.model")
 
 async function createTask (req, res){
     try {
-        const task = await taskModel.create(req.body);
+        //Collect data 
+        const {title, category, status, priority} = req.body;
+
+        //Validate data
+        if(!title || !category || !status || !priority){
+            return res.status(400).json({
+                message: "All fields are required"
+            })
+        }
+
+        //Create task
+        const task = await taskModel.create({
+            title, category, status, priority
+        });
+
+        //send response
         res.status(201).json({
             message: "Task created",
             task
@@ -16,20 +31,12 @@ async function createTask (req, res){
 }
 
 async function getTasks(req,res){
-    try {
-        const { category, status } = req.query;
-        console.log(category, status);
-        
-        let filter = {};
-
-        if (category) filter.category = category;
-        if (status) filter.status = status;
-
+    try {    
         const tasks = await taskModel.find(filter);
 
         res.status(200).json({
             count: tasks.length,
-            tasks , filter
+            tasks
         });
 
     } catch (err) {
@@ -42,7 +49,6 @@ async function getTasks(req,res){
 
 async function deleteTask(req,res){
     try {
-        console.log(req.params)
         await taskModel.findOneAndDelete({
             _id : req.params.id
         })
@@ -52,7 +58,7 @@ async function deleteTask(req,res){
         })
     } catch (err) {
         res.status(500).json({
-            message: "Error fetching tasks",
+            message: "Error deleting task",
             error: err.message
         });
     }
@@ -60,10 +66,13 @@ async function deleteTask(req,res){
 
 async function updateTask(req,res){
     try {
+        //Collect data
+        const {title,category,status,priority} = req.body;
+
         await taskModel.findOneAndUpdate({
             _id : req.params.id
         }, {
-            status: "Completed"
+            title, category, status, priority
         })
         res.status(200).json({
             message: "task updated",
