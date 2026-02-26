@@ -76,12 +76,13 @@ async function login(req, res){
 
         //Generate token
         const token = jwt.generateToken({id: user._id, email: user.email});
-        res.cookie("token", token)
-
-        //send response
+        res.cookie("token", token);
+        
+        // also include token in body so front end can store/use it
         res.status(200).json({
             message: "Login successful",
-            user
+            user,
+            token
         });
     }
     catch (err) {
