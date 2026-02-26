@@ -32,7 +32,7 @@ async function createTask (req, res){
 
 async function getTasks(req,res){
     try {    
-        const tasks = await taskModel.find(filter);
+        const tasks = await taskModel.find();
 
         res.status(200).json({
             count: tasks.length,
