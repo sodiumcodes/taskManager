@@ -21,6 +21,11 @@ const taskScehma = mongoose.Schema({
         enum: ["Low", "Medium", "High"],
         default : "Low",
         required : true
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        required: true
     }
 })
 const taskModel = mongoose.model("task", taskScehma);

@@ -4,6 +4,7 @@ async function createTask (req, res){
     try {
         //Collect data 
         const {title, category, status, priority} = req.body;
+        const userId = req.user?.id;
 
         //Validate data
         if(!title || !category || !status || !priority){
@@ -12,9 +13,15 @@ async function createTask (req, res){
             })
         }
 
+        if(!userId){
+            return res.status(401).json({
+                message: "User not authenticated"
+            })
+        }
+
         //Create task
         const task = await taskModel.create({
-            title, category, status, priority
+            title, category, status, priority, user: userId
         });
 
         //send response
@@ -32,7 +39,15 @@ async function createTask (req, res){
 
 async function getTasks(req,res){
     try {    
-        const tasks = await taskModel.find();
+        const userId = req.user.id;
+
+        if(!userId){
+            return res.status(401).json({
+                message: "User not authenticated"
+            })
+        }
+
+        const tasks = await taskModel.find({user : userId});
 
         res.status(200).json({
             count: tasks.length,
