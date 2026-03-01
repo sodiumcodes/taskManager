@@ -6,5 +6,6 @@ router.post("/create-task", protectRoute, postController.createTask)
 router.get("/get-tasks", protectRoute, postController.getTasks)
 router.delete("/delete-task/:id", protectRoute, postController.deleteTask)
 router.patch("/update-task/:id", protectRoute, postController.updateTask)
+router.patch("/update-status/:id", protectRoute, postController.updateStatus)
 
 module.exports = router
