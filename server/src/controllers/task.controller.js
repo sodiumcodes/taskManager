@@ -100,5 +100,25 @@ async function updateTask(req,res){
     }
 }
 
+async function updateStatus(req, res){
+    try {
+        const {status} = req.body;
 
-module.exports = {createTask, getTasks, deleteTask, updateTask}
+        await taskModel.findOneAndUpdate({
+            _id : req.params.id
+        }, {
+            status
+        })
+        res.status(200).json({
+            message: "task status updated",
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "Error while updating task status",
+            error: err.message
+        });
+    }
+}
+
+
+module.exports = {createTask, getTasks, deleteTask, updateTask, updateStatus}
