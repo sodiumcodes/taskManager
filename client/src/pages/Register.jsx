@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
-import "./Auth.css";
+// Tailwind is used for styling; Auth.css not needed
 
 const Register = () => {
   const navigate = useNavigate();
@@ -40,11 +40,17 @@ const Register = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h2>Register</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
+          Register
+        </h2>
 
-        {error && <div className="error-message">{error}</div>}
+        {error && (
+          <div className="bg-red-500 text-white px-4 py-2 rounded mb-4">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <input
@@ -54,6 +60,7 @@ const Register = () => {
             required
             value={formData.name}
             onChange={handleChange}
+            className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <input
@@ -63,6 +70,7 @@ const Register = () => {
             required
             value={formData.email}
             onChange={handleChange}
+            className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <input
@@ -72,15 +80,23 @@ const Register = () => {
             required
             value={formData.password}
             onChange={handleChange}
+            className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <button type="submit" disabled={loading}>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded font-semibold transition disabled:opacity-50"
+          >
             {loading ? "Registering..." : "Register"}
           </button>
         </form>
 
-        <p className="auth-link">
-          Already have an account? <a href="/">Login</a>
+        <p className="text-center text-sm mt-4 text-gray-600">
+          Already have an account?{' '}
+          <a className="text-blue-500 hover:underline" href="/">
+            Login
+          </a>
         </p>
       </div>
     </div>
