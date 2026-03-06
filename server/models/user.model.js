@@ -1,8 +1,9 @@
 const mongoose = require("mongoose")
-
+const image = require("../public/images/default.png")
 const userSchema = mongoose.Schema({
-    profile_picture :{
-        type: String
+    profile_picture: {
+        type: String,
+        default: image
     },
     name: {
         type: String,
