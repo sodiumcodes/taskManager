@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
+    // baseURL: "http://localhost:3000",
     baseURL: "https://taskmanager-ti21.onrender.com",
     withCredentials: true // allow cookies if backend sets them
 });
