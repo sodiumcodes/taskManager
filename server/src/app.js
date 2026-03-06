@@ -12,8 +12,8 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(cookieParser());
 app.use(cors({
-    origin : "http://localhost:5173",
-    credentials : true
+    origin: "https://task-manager-phi-five-12.vercel.app",
+    credentials: true
 }))
 
 app.use(morgan("dev"))
