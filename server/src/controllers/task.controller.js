@@ -1,4 +1,5 @@
-const taskModel = require("../../models/task.model")
+const taskModel = require("../../models/task.model");
+const userModel = require("../../models/user.model");
 
 async function createTask(req, res) {
     try {
@@ -119,7 +120,27 @@ async function updateStatus(req, res) {
         });
     }
 }
+const filterTask = async (req,res)=>{
+    try{
+        const filter = {
+            user: req.user.id,
+            ...req.body //destructuring
+        }
 
+        const tasks = await taskModel.find(filter);
+        res.status(200).json({
+            message: "tasks filtered",
+            tasks
+        })
+
+    }
+  catch(err){
+        res.status(500).json({
+            message: "Error while filtering",
+            error: err.message
+        })
+    }
+}
 async function getStats(req, res) {
     try {
         const id = req.user.id;
@@ -152,6 +173,4 @@ async function getStats(req, res) {
         })
     }
 }
-
-
-module.exports = { createTask, getTasks, deleteTask, updateTask, updateStatus, getStats }
+module.exports = {createTask, getTasks, deleteTask, updateTask, updateStatus, filterTask, getStats}
