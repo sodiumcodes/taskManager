@@ -200,7 +200,7 @@ const Sidebar = ({ user, onClose, isOpen }) => {
                         }}
                     >
                         <img
-                            src={user?.profile_picture || 'https://ik.imagekit.io/sodiumimages/taskManager/users/default.jpg'}
+                            src={user?.profile_picture?.url || 'https://ik.imagekit.io/sodiumimages/taskManager/users/default.jpg'}
                             alt={user?.name || 'User'}
                             style={{
                                 width: 38,
