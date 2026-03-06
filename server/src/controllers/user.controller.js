@@ -134,4 +134,25 @@ async function updateName(req, res) {
         })
     }
 }
-module.exports = { uploadPfp, phone, getuserDetails, updateName };
+
+async function changeEmail(req, res) {
+    try {
+        const user = await userModel.findOneAndUpdate({
+            _id: req.user.id
+        }, {
+            email: req.body.email
+        }, { new: true }).select("-password")
+        return res.status(201).json({
+            message: "email updated successfully",
+            user
+        })
+    }
+    catch (error) {
+        console.log("email not updated.\n", error);
+        return res.status(500).json({
+            message: "email not updated",
+            error
+        })
+    }
+}
+module.exports = { uploadPfp, phone, getuserDetails, updateName, changeEmail };
