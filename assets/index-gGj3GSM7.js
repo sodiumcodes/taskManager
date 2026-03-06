@@ -54,4 +54,4 @@ Please change the parent <Route path="${e}"> to <Route path="${e===`/`?`*`:`${e}
             display: flex !important;
           }
         }
-      `})]})},La=({children:e})=>localStorage.getItem(`token`)?e:(0,z.jsx)(jt,{to:`/`,replace:!0});function Ra(){return(0,z.jsx)(xn,{children:(0,z.jsxs)(Pt,{children:[(0,z.jsx)(Mt,{path:`/`,element:(0,z.jsx)(Oa,{})}),(0,z.jsx)(Mt,{path:`/register`,element:(0,z.jsx)(ka,{})}),(0,z.jsx)(Mt,{path:`/dashboard`,element:(0,z.jsx)(La,{children:(0,z.jsx)(Ia,{})})})]})})}(0,Ta.createRoot)(document.getElementById(`root`)).render((0,z.jsx)(S.StrictMode,{children:(0,z.jsx)(Ra,{})}));
+      `})]})},La=({children:e})=>localStorage.getItem(`token`)?e:(0,z.jsx)(jt,{to:`/`,replace:!0});function Ra(){return(0,z.jsx)(xn,{basename:`/taskManager`,children:(0,z.jsxs)(Pt,{children:[(0,z.jsx)(Mt,{path:`/`,element:(0,z.jsx)(Oa,{})}),(0,z.jsx)(Mt,{path:`/register`,element:(0,z.jsx)(ka,{})}),(0,z.jsx)(Mt,{path:`/dashboard`,element:(0,z.jsx)(La,{children:(0,z.jsx)(Ia,{})})})]})})}(0,Ta.createRoot)(document.getElementById(`root`)).render((0,z.jsx)(S.StrictMode,{children:(0,z.jsx)(Ra,{})}));
