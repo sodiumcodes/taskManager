@@ -3,34 +3,54 @@ const userModel = require('../../models/user.model');
 const taskModel = require('../../models/task.model');
 const uploadPfp = async (req, res) => {
     try {
+
         async function uploadFile(buffer) {
             const response = await client.files.upload({
-                file: buffer.toString('base64'),
-                fileName: 'image.jpg',
+                file: buffer.toString("base64"),
+                fileName: "image.jpg",
                 folder: "/taskManager/users"
             });
             return response;
         }
+
+        // Get current user
+        const currentUser = await userModel.findById(req.user.id);
+
+        // Delete old profile picture if exists
+        if (currentUser.profile_picture) {
+
+            const fileIdFromUrl = currentUser.profile_picture
+                .split("taskManager/users/")[1]
+                ?.split("?")[0];
+
+            if (fileIdFromUrl) {
+                await client.files.delete(fileIdFromUrl);
+            }
+        }
+
+        // Upload new image
         const image = await uploadFile(req.file.buffer);
 
-        const user = await userModel.findOneAndUpdate({
-            _id: req.user.id
-        }, {
-            profile_picture: image.url,
-        })
+        // Update DB
+        const user = await userModel.findByIdAndUpdate(
+            req.user.id,
+            { profile_picture: image.url },
+            { new: true }
+        );
+
         return res.status(201).json({
-            message: "picture uploaded successfully",
+            message: "Picture uploaded successfully",
             user
-        })
+        });
 
     } catch (error) {
         console.log("Image not uploaded.\n", error);
         return res.status(500).json({
             message: "Image not uploaded",
             error
-        })
+        });
     }
-}
+};
 const phone = async (req, res) => {
     try {
         const user = await userModel.findOneAndUpdate({
