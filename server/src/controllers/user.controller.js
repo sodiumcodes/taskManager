@@ -30,4 +30,25 @@ const uploadPfp = async (req, res) => {
         })
     }
 }
-module.exports = uploadPfp;
+const phone = async(req, res) =>{
+    try{
+        const user = await userModel.findOneAndUpdate({
+            _id: req.user.id
+        }, {
+            phone : req.body.phone
+        })
+        return res.status(201).json({
+            message: "phone no. added successfully",
+            user
+        })
+    }
+    catch(error){
+        console.log("Phone no. not added.\n", error);
+        return res.status(500).json({
+            message: "Phone no. not added",
+            error
+        })
+    }
+}
+
+module.exports = {uploadPfp, phone};
