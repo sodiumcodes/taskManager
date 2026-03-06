@@ -9,6 +9,5 @@ router.patch("/update-task/:id", protectRoute, postController.updateTask)
 router.patch("/update-status/:id", protectRoute, postController.updateStatus)
 router.get("/filter-task", protectRoute, postController.filterTask)
 router.get("/stats", protectRoute, postController.getStats)
-router.patch("/change-email", protectRoute, postController.changeEmail)
 
 module.exports = router

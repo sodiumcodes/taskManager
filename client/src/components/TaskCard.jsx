@@ -6,15 +6,21 @@ const TaskCard = ({ task, onDelete, onUpdateStatus }) => {
     const [confirming, setConfirming] = useState(false);
 
     const priorityColors = {
-        High: { bg: 'rgba(239, 68, 68, 0.12)', color: '#f87171', border: 'rgba(239, 68, 68, 0.25)' },
-        Medium: { bg: 'rgba(245, 158, 11, 0.12)', color: '#fbbf24', border: 'rgba(245, 158, 11, 0.25)' },
-        Low: { bg: 'rgba(34, 197, 94, 0.12)', color: '#34d399', border: 'rgba(34, 197, 94, 0.25)' },
+        High: { bg: 'rgba(239, 68, 68, 0.1)', color: '#f87171', border: 'rgba(239, 68, 68, 0.2)' },
+        Medium: { bg: 'rgba(245, 158, 11, 0.1)', color: '#fbbf24', border: 'rgba(245, 158, 11, 0.2)' },
+        Low: { bg: 'rgba(34, 197, 94, 0.1)', color: '#34d399', border: 'rgba(34, 197, 94, 0.2)' },
     };
 
     const statusColors = {
-        'Not Started': { bg: 'rgba(96, 165, 250, 0.12)', color: '#60a5fa' },
-        Pending: { bg: 'rgba(251, 191, 36, 0.12)', color: '#fbbf24' },
-        Completed: { bg: 'rgba(34, 197, 94, 0.12)', color: '#34d399' },
+        'Not Started': { bg: 'rgba(96, 165, 250, 0.1)', color: '#60a5fa', icon: '○' },
+        Pending: { bg: 'rgba(251, 191, 36, 0.1)', color: '#fbbf24', icon: '◐' },
+        Completed: { bg: 'rgba(34, 197, 94, 0.1)', color: '#34d399', icon: '●' },
+    };
+
+    const categoryIcons = {
+        Study: '📚',
+        Work: '💼',
+        Personal: '🏠',
     };
 
     const categoryColors = {
@@ -26,6 +32,7 @@ const TaskCard = ({ task, onDelete, onUpdateStatus }) => {
     const pStyle = priorityColors[task.priority] || priorityColors.Low;
     const sStyle = statusColors[task.status] || statusColors['Not Started'];
     const catColor = categoryColors[task.category] || '#818cf8';
+    const catIcon = categoryIcons[task.category] || '📋';
 
     const timeAgo = (dateStr) => {
         if (!dateStr) return '';
@@ -63,19 +70,27 @@ const TaskCard = ({ task, onDelete, onUpdateStatus }) => {
                 flexDirection: 'column',
                 gap: '14px',
                 borderLeft: `3px solid ${catColor}`,
-                animation: 'fadeInUp 0.4s ease-out forwards',
+                position: 'relative',
+                overflow: 'hidden',
             }}
         >
+            {/* Completed overlay */}
+            {task.status === 'Completed' && (
+                <div style={{ position: 'absolute', top: '10px', right: '10px', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-success)', boxShadow: '0 0 8px rgba(34, 197, 94, 0.4)' }} />
+            )}
+
             {/* Header: title + priority */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
                 <h3
                     style={{
-                        fontSize: '1rem',
+                        fontSize: '0.975rem',
                         fontWeight: 600,
-                        color: 'var(--text-primary)',
-                        lineHeight: 1.4,
+                        color: task.status === 'Completed' ? 'var(--text-secondary)' : 'var(--text-primary)',
+                        lineHeight: 1.45,
                         flex: 1,
                         wordBreak: 'break-word',
+                        textDecoration: task.status === 'Completed' ? 'line-through' : 'none',
+                        textDecorationColor: 'var(--text-muted)',
                     }}
                 >
                     {task.title}
@@ -83,14 +98,14 @@ const TaskCard = ({ task, onDelete, onUpdateStatus }) => {
                 <span
                     style={{
                         padding: '3px 10px',
-                        fontSize: '0.7rem',
+                        fontSize: '0.68rem',
                         fontWeight: 700,
                         borderRadius: 'var(--radius-full)',
                         background: pStyle.bg,
                         color: pStyle.color,
                         border: `1px solid ${pStyle.border}`,
                         whiteSpace: 'nowrap',
-                        letterSpacing: '0.03em',
+                        letterSpacing: '0.04em',
                         textTransform: 'uppercase',
                         flexShrink: 0,
                     }}
@@ -106,17 +121,15 @@ const TaskCard = ({ task, onDelete, onUpdateStatus }) => {
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '5px',
-                        padding: '3px 10px',
+                        padding: '4px 10px',
                         fontSize: '0.72rem',
                         fontWeight: 600,
                         borderRadius: 'var(--radius-full)',
-                        background: `${catColor}18`,
+                        background: `${catColor}12`,
                         color: catColor,
                     }}
                 >
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-                        <circle cx="12" cy="12" r="6" />
-                    </svg>
+                    <span style={{ fontSize: '0.8rem' }}>{catIcon}</span>
                     {task.category}
                 </span>
 
@@ -149,10 +162,11 @@ const TaskCard = ({ task, onDelete, onUpdateStatus }) => {
                                 fontWeight: 600,
                                 borderRadius: 'var(--radius-sm)',
                                 border: 'none',
-                                background: 'rgba(34, 197, 94, 0.15)',
+                                background: 'var(--color-success-dim)',
                                 color: 'var(--color-success)',
                                 cursor: 'pointer',
                                 fontFamily: 'inherit',
+                                transition: 'all var(--transition-fast)',
                             }}
                         >
                             ✓
@@ -165,10 +179,11 @@ const TaskCard = ({ task, onDelete, onUpdateStatus }) => {
                                 fontWeight: 600,
                                 borderRadius: 'var(--radius-sm)',
                                 border: 'none',
-                                background: 'rgba(148, 163, 184, 0.1)',
+                                background: 'rgba(148, 163, 184, 0.08)',
                                 color: 'var(--text-muted)',
                                 cursor: 'pointer',
                                 fontFamily: 'inherit',
+                                transition: 'all var(--transition-fast)',
                             }}
                         >
                             ✕
@@ -178,7 +193,7 @@ const TaskCard = ({ task, onDelete, onUpdateStatus }) => {
                     <span
                         onClick={() => setIsEditing(true)}
                         style={{
-                            padding: '3px 10px',
+                            padding: '4px 10px',
                             fontSize: '0.72rem',
                             fontWeight: 600,
                             borderRadius: 'var(--radius-full)',
@@ -186,8 +201,12 @@ const TaskCard = ({ task, onDelete, onUpdateStatus }) => {
                             color: sStyle.color,
                             cursor: 'pointer',
                             transition: 'all var(--transition-fast)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
                         }}
                     >
+                        <span style={{ fontSize: '0.6rem' }}>{sStyle.icon}</span>
                         {task.status}
                     </span>
                 )}
@@ -199,11 +218,14 @@ const TaskCard = ({ task, onDelete, onUpdateStatus }) => {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    paddingTop: '8px',
+                    paddingTop: '10px',
                     borderTop: '1px solid var(--border-color)',
                 }}
             >
-                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                    </svg>
                     {timeAgo(task.createdAt)}
                 </span>
 
@@ -220,7 +242,7 @@ const TaskCard = ({ task, onDelete, onUpdateStatus }) => {
                                 justifyContent: 'center',
                                 borderRadius: 'var(--radius-sm)',
                                 border: 'none',
-                                background: 'rgba(96, 165, 250, 0.1)',
+                                background: 'var(--color-info-dim)',
                                 color: 'var(--color-info)',
                                 cursor: 'pointer',
                                 transition: 'all var(--transition-fast)',
@@ -243,7 +265,7 @@ const TaskCard = ({ task, onDelete, onUpdateStatus }) => {
                             justifyContent: 'center',
                             borderRadius: 'var(--radius-sm)',
                             border: 'none',
-                            background: confirming ? 'rgba(239, 68, 68, 0.25)' : 'rgba(239, 68, 68, 0.1)',
+                            background: confirming ? 'rgba(239, 68, 68, 0.2)' : 'var(--color-danger-dim)',
                             color: 'var(--color-danger)',
                             cursor: 'pointer',
                             transition: 'all var(--transition-fast)',
