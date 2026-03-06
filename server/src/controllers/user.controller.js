@@ -13,28 +13,25 @@ const uploadPfp = async (req, res) => {
             return response;
         }
 
-        // Get current user
         const currentUser = await userModel.findById(req.user.id);
 
-        // Delete old profile picture if exists
-        if (currentUser.profile_picture) {
-
-            const fileIdFromUrl = currentUser.profile_picture
-                .split("taskManager/users/")[1]
-                ?.split("?")[0];
-
-            if (fileIdFromUrl) {
-                await client.files.delete(fileIdFromUrl);
-            }
+        // Delete old picture if exists
+        if (currentUser.profile_picture?.fileId) {
+            await client.files.delete(currentUser.profile_picture.fileId);
         }
 
         // Upload new image
         const image = await uploadFile(req.file.buffer);
 
-        // Update DB
+        // Save BOTH url and fileId
         const user = await userModel.findByIdAndUpdate(
             req.user.id,
-            { profile_picture: image.url },
+            {
+                profile_picture: {
+                    url: image.url,
+                    fileId: image.fileId
+                }
+            },
             { new: true }
         );
 
@@ -45,6 +42,7 @@ const uploadPfp = async (req, res) => {
 
     } catch (error) {
         console.log("Image not uploaded.\n", error);
+
         return res.status(500).json({
             message: "Image not uploaded",
             error
