@@ -1,9 +1,8 @@
 const mongoose = require("mongoose")
-const image = require("../public/images/default.png")
 const userSchema = mongoose.Schema({
     profile_picture: {
         type: String,
-        default: image
+        default: "https://ik.imagekit.io/sodiumimages/taskManager/users/default.jpg"
     },
     name: {
         type: String,
