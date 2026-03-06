@@ -1,5 +1,6 @@
 const client = require('../../config/imagekit');
 const userModel = require('../../models/user.model');
+const taskModel = require('../../models/task.model');
 const uploadPfp = async (req, res) => {
     try {
         async function uploadFile(buffer) {
@@ -89,7 +90,7 @@ async function updateName(req, res) {
             _id: req.user.id
         }, {
             name: req.body.name
-        })
+        }, { new: true }).select("-password")
         return res.status(201).json({
             message: "name updated successfully",
             user

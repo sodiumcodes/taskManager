@@ -5,6 +5,7 @@ import DashboardLayout from '../components/DashboardLayout';
 import TaskCard from '../components/TaskCard';
 import StatsCard from '../components/StatsCard';
 import AddTaskModal from '../components/AddTaskModal';
+import ProfilePanel from '../components/ProfilePanel';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   // Filters
   const [filterCategory, setFilterCategory] = useState('All');
@@ -28,7 +30,25 @@ const Dashboard = () => {
     }
     setUser(JSON.parse(storedUser));
     fetchTasks();
+    fetchUserProfile();
   }, [navigate]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const res = await api.get('/user/details');
+      if (res.data.user) {
+        setUser(res.data.user);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+      }
+    } catch (err) {
+      // Non-blocking — falls back to localStorage data
+    }
+  };
+
+  const handleUserUpdate = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
 
   const fetchTasks = async () => {
     try {
@@ -130,7 +150,7 @@ const Dashboard = () => {
   }
 
   return (
-    <DashboardLayout user={user}>
+    <DashboardLayout user={user} onProfileOpen={() => setProfileOpen(true)}>
       {/* Error */}
       {error && (
         <div className="alert alert-error" style={{ marginBottom: '20px' }}>
@@ -420,6 +440,14 @@ const Dashboard = () => {
 
       {/* Add Task Modal */}
       <AddTaskModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onAdd={handleAddTask} />
+
+      {/* Profile Panel */}
+      <ProfilePanel
+        isOpen={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        user={user}
+        onUserUpdate={handleUserUpdate}
+      />
 
       <style>{`
         @media (max-width: 768px) {

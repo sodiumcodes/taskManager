@@ -1,4 +1,4 @@
-const { uploadPfp, phone } = require("../controllers/user.controller");
+const { uploadPfp, phone, updateName, getuserDetails } = require("../controllers/user.controller");
 const protectRoute = require("../middlewares/auth.middleware");
 const upload = require("../middlewares/upload.middleware")
 const router = require("express").Router()

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Sidebar from './Sidebar';
 
-const DashboardLayout = ({ user, children }) => {
+const DashboardLayout = ({ user, children, onProfileOpen }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
@@ -21,7 +21,7 @@ const DashboardLayout = ({ user, children }) => {
                 }}
                 className="main-content-area"
             >
-                {/* Top bar for mobile */}
+                {/* Top bar */}
                 <header
                     className="mobile-topbar"
                     style={{
@@ -76,8 +76,30 @@ const DashboardLayout = ({ user, children }) => {
                         </h2>
                     </div>
 
-                    {/* User avatar (desktop) */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {/* User avatar — clickable to open profile */}
+                    <button
+                        onClick={onProfileOpen}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            background: 'none',
+                            border: '2px solid transparent',
+                            borderRadius: 'var(--radius-full)',
+                            cursor: 'pointer',
+                            padding: '2px',
+                            transition: 'all var(--transition-fast)',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                            e.currentTarget.style.boxShadow = '0 0 12px rgba(99, 102, 241, 0.25)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = 'transparent';
+                            e.currentTarget.style.boxShadow = 'none';
+                        }}
+                        title="View profile"
+                    >
                         <img
                             src={user?.profile_picture || 'https://ik.imagekit.io/sodiumimages/taskManager/users/default.jpg'}
                             alt={user?.name || 'User'}
@@ -86,10 +108,9 @@ const DashboardLayout = ({ user, children }) => {
                                 height: 36,
                                 borderRadius: 'var(--radius-full)',
                                 objectFit: 'cover',
-                                border: '2px solid var(--border-color)',
                             }}
                         />
-                    </div>
+                    </button>
                 </header>
 
                 {/* Page content */}
