@@ -1,20 +1,20 @@
 const taskModel = require("../../models/task.model");
 const userModel = require("../../models/user.model");
 
-async function createTask (req, res){
+async function createTask(req, res) {
     try {
         //Collect data 
-        const {title, category, status, priority} = req.body;
+        const { title, category, status, priority } = req.body;
         const userId = req.user?.id;
 
         //Validate data
-        if(!title || !category || !status || !priority){
+        if (!title || !category || !status || !priority) {
             return res.status(400).json({
                 message: "All fields are required"
             })
         }
 
-        if(!userId){
+        if (!userId) {
             return res.status(401).json({
                 message: "User not authenticated"
             })
@@ -38,17 +38,17 @@ async function createTask (req, res){
     }
 }
 
-async function getTasks(req,res){
-    try {    
+async function getTasks(req, res) {
+    try {
         const userId = req.user.id;
 
-        if(!userId){
+        if (!userId) {
             return res.status(401).json({
                 message: "User not authenticated"
             })
         }
 
-        const tasks = await taskModel.find({user : userId});
+        const tasks = await taskModel.find({ user: userId });
 
         res.status(200).json({
             count: tasks.length,
@@ -63,10 +63,10 @@ async function getTasks(req,res){
     }
 }
 
-async function deleteTask(req,res){
+async function deleteTask(req, res) {
     try {
         await taskModel.findOneAndDelete({
-            _id : req.params.id
+            _id: req.params.id
         })
 
         res.status(200).json({
@@ -80,13 +80,13 @@ async function deleteTask(req,res){
     }
 }
 
-async function updateTask(req,res){
+async function updateTask(req, res) {
     try {
         //Collect data
-        const {title,category,status,priority} = req.body;
+        const { title, category, status, priority } = req.body;
 
         await taskModel.findOneAndUpdate({
-            _id : req.params.id
+            _id: req.params.id
         }, {
             title, category, status, priority
         })
@@ -101,12 +101,12 @@ async function updateTask(req,res){
     }
 }
 
-async function updateStatus(req, res){
+async function updateStatus(req, res) {
     try {
-        const {status} = req.body;
+        const { status } = req.body;
 
         await taskModel.findOneAndUpdate({
-            _id : req.params.id
+            _id: req.params.id
         }, {
             status
         })
@@ -128,17 +128,49 @@ const filterTask = async (req,res)=>{
         }
 
         const tasks = await taskModel.find(filter);
-
         res.status(200).json({
             message: "tasks filtered",
             tasks
         })
 
-    }catch(err){
+    }
+  catch(err){
         res.status(500).json({
             message: "Error while filtering",
             error: err.message
         })
     }
 }
-module.exports = {createTask, getTasks, deleteTask, updateTask, updateStatus, filterTask}
+async function getStats(req, res) {
+    try {
+        const id = req.user.id;
+
+        if (!id) {
+            return res.status(401).json({
+                message: "User not authenticated"
+            })
+        }
+
+        const status = await taskModel.aggregate([
+            { $match: { user: id } },
+            {
+                $group: {
+                    _id: "$status",
+                    count: { $sum: 1 }
+                }
+            }
+        ])
+
+        return res.status(200).json({
+            message: "Stats fetched successfully",
+            status
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(401).json({
+            message: "Error while fetching stats",
+            error
+        })
+    }
+}
+module.exports = {createTask, getTasks, deleteTask, updateTask, updateStatus, filterTask, getStats}
