@@ -92,7 +92,21 @@ async function login(req, res) {
         });
     }
 }
-
+const logout = (req, res) => {
+    try{
+        res.clearCookie("token")
+        return res.status(200).json({
+            message: "user logout successfully.",
+        })
+    }
+    catch(error){
+        console.log("user was not logged-out.\n", error);
+        return res.status(500).json({
+            message: "user was not logged-out.",
+            error
+        })
+    }
+}
 function me(req, res) {
     try {
         res.status(200).json({
@@ -106,9 +120,9 @@ function me(req, res) {
         })
     }
 }
-
 module.exports = {
     register,
     login,
+    logout,
     me
 }
