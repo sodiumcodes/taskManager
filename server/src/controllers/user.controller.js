@@ -4,27 +4,39 @@ const taskModel = require('../../models/task.model');
 const uploadPfp = async (req, res) => {
     try {
 
-        async function uploadFile(buffer) {
+        if (!req.file) {
+            return res.status(400).json({
+                message: "No file uploaded"
+            });
+        }
+
+        // Upload file to ImageKit
+        const uploadFile = async (buffer) => {
             const response = await client.files.upload({
                 file: buffer.toString("base64"),
-                fileName: "image.jpg",
+                fileName: `profile_${Date.now()}.jpg`,
                 folder: "/taskManager/users"
             });
+
             return response;
-        }
+        };
 
         const currentUser = await userModel.findById(req.user.id);
 
-        // Delete old picture if exists
+        // Delete old profile picture if exists
         if (currentUser.profile_picture?.fileId) {
-            await client.files.delete(currentUser.profile_picture.fileId);
+            try {
+                await client.files.delete(currentUser.profile_picture.fileId);
+            } catch (err) {
+                console.log("Old image deletion failed:", err.message);
+            }
         }
 
         // Upload new image
         const image = await uploadFile(req.file.buffer);
 
-        // Save BOTH url and fileId
-        const user = await userModel.findByIdAndUpdate(
+        // Update user
+        const updatedUser = await userModel.findByIdAndUpdate(
             req.user.id,
             {
                 profile_picture: {
@@ -36,16 +48,16 @@ const uploadPfp = async (req, res) => {
         );
 
         return res.status(201).json({
-            message: "Picture uploaded successfully",
-            user
+            message: "Profile picture uploaded successfully",
+            user: updatedUser
         });
 
     } catch (error) {
-        console.log("Image not uploaded.\n", error);
+        console.log("Image not uploaded:", error);
 
         return res.status(500).json({
-            message: "Image not uploaded",
-            error
+            message: "Image upload failed",
+            error: error.message
         });
     }
 };
