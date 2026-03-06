@@ -12,12 +12,11 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(cookieParser());
 app.use(cors({
-    origin : "http://localhost:5173",
+    origin : "https://sodiumcodes.github.io/taskManager",
     credentials : true
 }))
 
 app.use(morgan("dev"))
-
 
 app.use('/task', postRouter)
 app.use('/auth', authRouter)

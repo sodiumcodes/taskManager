@@ -6,7 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/taskManager">
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
