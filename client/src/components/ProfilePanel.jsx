@@ -10,6 +10,9 @@ const ProfilePanel = ({ isOpen, onClose, user, onUserUpdate, stats }) => {
     const [newPhone, setNewPhone] = useState(user?.phone || '');
     const [newEmail, setNewEmail] = useState(user?.email || '');
     const [uploading, setUploading] = useState(false);
+    const [changingPassword, setChangingPassword] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const fileInputRef = useRef(null);
@@ -105,6 +108,34 @@ const ProfilePanel = ({ isOpen, onClose, user, onUserUpdate, stats }) => {
             clearMessages();
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to update phone');
+            clearMessages();
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleChangePassword = async () => {
+        if (!newPassword || newPassword.length < 6) {
+            setError('Password must be at least 6 characters');
+            clearMessages();
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            setError('Passwords do not match');
+            clearMessages();
+            return;
+        }
+        setLoading(true);
+        setError('');
+        try {
+            await api.patch('/user/change-password', { password: newPassword });
+            setChangingPassword(false);
+            setNewPassword('');
+            setConfirmPassword('');
+            setSuccess('Password changed successfully!');
+            clearMessages();
+        } catch (err) {
+            setError(err.response?.data?.message || 'Failed to change password');
             clearMessages();
         } finally {
             setLoading(false);
@@ -426,6 +457,73 @@ const ProfilePanel = ({ isOpen, onClose, user, onUserUpdate, stats }) => {
                         type="tel"
                         placeholder="Enter phone number"
                     />
+
+                    {/* Password Change */}
+                    <div
+                        style={{
+                            padding: '14px 16px',
+                            borderRadius: 'var(--radius-sm)',
+                            background: 'var(--bg-primary)',
+                            border: '1px solid var(--border-color)',
+                            marginBottom: '10px',
+                        }}
+                    >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: changingPassword ? '10px' : 0 }}>
+                            <div>
+                                <p style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>
+                                    Password
+                                </p>
+                                {!changingPassword && (
+                                    <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)' }}>••••••••</p>
+                                )}
+                            </div>
+                            {!changingPassword && (
+                                <button
+                                    onClick={() => setChangingPassword(true)}
+                                    style={{
+                                        padding: '5px 12px', fontSize: '0.72rem', fontWeight: 600,
+                                        borderRadius: 'var(--radius-sm)',
+                                        border: '1px solid rgba(251, 191, 36, 0.15)',
+                                        background: 'var(--color-warning-dim)',
+                                        color: 'var(--color-warning)',
+                                        cursor: 'pointer', fontFamily: 'inherit',
+                                        transition: 'all var(--transition-fast)',
+                                    }}
+                                >
+                                    Change
+                                </button>
+                            )}
+                        </div>
+                        {changingPassword && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    placeholder="New password (min 6 chars)"
+                                    className="input"
+                                    style={{ padding: '9px 12px', fontSize: '0.875rem' }}
+                                />
+                                <input
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder="Confirm new password"
+                                    className="input"
+                                    style={{ padding: '9px 12px', fontSize: '0.875rem' }}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleChangePassword()}
+                                />
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button onClick={handleChangePassword} disabled={loading} className="btn btn-primary" style={{ padding: '9px 16px', fontSize: '0.78rem', flex: 1 }}>
+                                        {loading ? '...' : 'Update Password'}
+                                    </button>
+                                    <button onClick={() => { setChangingPassword(false); setNewPassword(''); setConfirmPassword(''); }} className="btn btn-ghost" style={{ padding: '9px 14px', fontSize: '0.78rem' }}>
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
                     {/* Member since */}
                     {memberSince && (

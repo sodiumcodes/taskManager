@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/axios';
 
-const Sidebar = ({ user, onClose, isOpen }) => {
+const Sidebar = ({ user, onClose, isOpen, taskCount }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [loggingOut, setLoggingOut] = useState(false);
@@ -172,7 +172,21 @@ const Sidebar = ({ user, onClose, isOpen }) => {
                                     }} />
                                 )}
                                 {item.icon}
-                                {item.label}
+                                <span style={{ flex: 1 }}>{item.label}</span>
+                                {taskCount > 0 && (
+                                    <span style={{
+                                        fontSize: '0.68rem',
+                                        fontWeight: 700,
+                                        color: isActive ? 'var(--accent-primary)' : 'var(--text-dim)',
+                                        background: isActive ? 'rgba(99, 102, 241, 0.15)' : 'rgba(148, 163, 184, 0.08)',
+                                        padding: '2px 8px',
+                                        borderRadius: 'var(--radius-full)',
+                                        minWidth: '24px',
+                                        textAlign: 'center',
+                                    }}>
+                                        {taskCount}
+                                    </span>
+                                )}
                             </button>
                         );
                     })}
