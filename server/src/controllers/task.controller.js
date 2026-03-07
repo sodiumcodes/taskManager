@@ -4,7 +4,7 @@ const userModel = require("../../models/user.model");
 async function createTask(req, res) {
     try {
         //Collect data 
-        const { title, category, status, priority } = req.body;
+        const { title, description, category, status, priority, dueDate } = req.body;
         const userId = req.user?.id;
 
         //Validate data
@@ -22,7 +22,7 @@ async function createTask(req, res) {
 
         //Create task
         const task = await taskModel.create({
-            title, category, status, priority, user: userId
+            title, description, category, status, priority, user: userId, dueDate
         });
 
         //send response
@@ -48,7 +48,31 @@ async function getTasks(req, res) {
             })
         }
 
-        const tasks = await taskModel.find({ user: userId });
+        const { sortBy, order } = req.query;
+        const sortOrder = order === 'asc' ? 1 : -1;
+
+        // Priority and status need custom sort since they're strings
+        const priorityOrder = { High: 1, Medium: 2, Low: 3 };
+        const statusOrder = { 'Not Started': 1, Pending: 2, Completed: 3 };
+
+        let tasks;
+
+        if (sortBy === 'priority' || sortBy === 'status') {
+            // Fetch all then sort in memory for custom ordering
+            tasks = await taskModel.find({ user: userId });
+            const orderMap = sortBy === 'priority' ? priorityOrder : statusOrder;
+            tasks.sort((a, b) => {
+                const aVal = orderMap[a[sortBy]] || 99;
+                const bVal = orderMap[b[sortBy]] || 99;
+                return (aVal - bVal) * sortOrder;
+            });
+        } else if (sortBy) {
+            // MongoDB sort for date fields
+            tasks = await taskModel.find({ user: userId }).sort({ [sortBy]: sortOrder });
+        } else {
+            // Default: newest first
+            tasks = await taskModel.find({ user: userId }).sort({ createdAt: -1 });
+        }
 
         res.status(200).json({
             count: tasks.length,
@@ -83,12 +107,12 @@ async function deleteTask(req, res) {
 async function updateTask(req, res) {
     try {
         //Collect data
-        const { title, category, status, priority } = req.body;
+        const { title, description, category, status, priority, dueDate } = req.body;
 
         await taskModel.findOneAndUpdate({
             _id: req.params.id
         }, {
-            title, category, status, priority
+            title, description, category, status, priority, dueDate
         })
         res.status(200).json({
             message: "task updated",
@@ -120,8 +144,8 @@ async function updateStatus(req, res) {
         });
     }
 }
-const filterTask = async (req,res)=>{
-    try{
+const filterTask = async (req, res) => {
+    try {
         const filter = {
             user: req.user.id,
             ...req.body //destructuring
@@ -134,7 +158,7 @@ const filterTask = async (req,res)=>{
         })
 
     }
-  catch(err){
+    catch (err) {
         res.status(500).json({
             message: "Error while filtering",
             error: err.message
@@ -173,4 +197,84 @@ async function getStats(req, res) {
         })
     }
 }
-module.exports = {createTask, getTasks, deleteTask, updateTask, updateStatus, filterTask, getStats}
+
+async function addSubtask(req, res) {
+    try {
+        const { title } = req.body;
+        const task = await taskModel.findOneAndUpdate({
+            _id: req.params.taskId
+        }, {
+            $push: {
+                subtasks: { title }
+            }
+        }, { new: true })
+        res.status(200).json({
+            message: "subtask added",
+            task
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "Error while adding subtask",
+            error: err.message
+        })
+    }
+}
+
+async function updateSubtask(req, res) {
+    try {
+        const { taskId, subtaskId } = req.params;
+        const { done } = req.body;
+        const task = await taskModel.findOneAndUpdate({
+            _id: taskId
+        }, {
+            $set: {
+                "subtasks.$[subtask].done": done
+            }
+        }, { new: true, arrayFilters: [{ "subtask._id": subtaskId }] })
+        res.status(200).json({
+            message: "subtask updated",
+            task
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "Error while updating subtask",
+            error: err.message
+        })
+    }
+}
+
+async function deleteSubtask(req, res) {
+    try {
+        const { taskId, subtaskId } = req.params;
+        const task = await taskModel.findOneAndUpdate({
+            _id: taskId
+        }, {
+            $pull: {
+                subtasks: { _id: subtaskId }
+            }
+        }, { new: true })
+        res.status(200).json({
+            message: "subtask deleted",
+            task
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "Error while deleting subtask",
+            error: err.message
+        })
+    }
+}
+
+module.exports =
+{
+    createTask,
+    getTasks,
+    deleteTask,
+    updateTask,
+    updateStatus,
+    filterTask,
+    getStats,
+    addSubtask,
+    updateSubtask,
+    deleteSubtask
+}
