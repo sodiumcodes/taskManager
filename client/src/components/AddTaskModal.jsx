@@ -2,8 +2,10 @@ import { useState } from 'react';
 
 const AddTaskModal = ({ isOpen, onClose, onAdd }) => {
     const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
     const [category, setCategory] = useState('Personal');
     const [priority, setPriority] = useState('Low');
+    const [dueDate, setDueDate] = useState('');
     const [loading, setLoading] = useState(false);
 
     if (!isOpen) return null;
@@ -16,13 +18,17 @@ const AddTaskModal = ({ isOpen, onClose, onAdd }) => {
         try {
             await onAdd({
                 title: title.trim(),
+                ...(description.trim() ? { description: description.trim() } : {}),
                 category,
                 status: 'Not Started',
                 priority,
+                ...(dueDate ? { dueDate } : {}),
             });
             setTitle('');
+            setDescription('');
             setCategory('Personal');
             setPriority('Low');
+            setDueDate('');
             onClose();
         } catch (err) {
             // error handled by parent
@@ -141,8 +147,23 @@ const AddTaskModal = ({ isOpen, onClose, onAdd }) => {
                         />
                     </div>
 
+                    {/* Description */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px', letterSpacing: '0.02em' }}>
+                            Notes <span style={{ color: 'var(--text-dim)', fontWeight: 400 }}>(optional)</span>
+                        </label>
+                        <textarea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Add details or notes..."
+                            rows={3}
+                            className="input"
+                            style={{ resize: 'vertical', minHeight: '60px' }}
+                        />
+                    </div>
+
                     {/* Category & Priority row */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '28px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
                         <div>
                             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px', letterSpacing: '0.02em' }}>
                                 Category
@@ -171,6 +192,20 @@ const AddTaskModal = ({ isOpen, onClose, onAdd }) => {
                                 <option value="High">🔴 High</option>
                             </select>
                         </div>
+                    </div>
+
+                    {/* Due Date */}
+                    <div style={{ marginBottom: '28px' }}>
+                        <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px', letterSpacing: '0.02em' }}>
+                            Due Date <span style={{ color: 'var(--text-dim)', fontWeight: 400 }}>(optional)</span>
+                        </label>
+                        <input
+                            type="date"
+                            value={dueDate}
+                            onChange={(e) => setDueDate(e.target.value)}
+                            className="input"
+                            style={{ colorScheme: 'dark' }}
+                        />
                     </div>
 
                     {/* Submit */}

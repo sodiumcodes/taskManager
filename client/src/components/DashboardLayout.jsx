@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Sidebar from './Sidebar';
 
-const DashboardLayout = ({ user, children, onProfileOpen }) => {
+const DashboardLayout = ({ user, children, onProfileOpen, taskCount }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const getGreeting = () => {
@@ -17,6 +17,7 @@ const DashboardLayout = ({ user, children, onProfileOpen }) => {
                 user={user}
                 isOpen={sidebarOpen}
                 onClose={() => setSidebarOpen(false)}
+                taskCount={taskCount}
             />
 
             {/* Main content */}

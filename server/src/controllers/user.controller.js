@@ -1,6 +1,7 @@
 const client = require('../../config/imagekit');
 const userModel = require('../../models/user.model');
 const taskModel = require('../../models/task.model');
+const bcrypt = require('bcrypt');
 const uploadPfp = async (req, res) => {
     try {
 
@@ -155,4 +156,26 @@ async function changeEmail(req, res) {
         })
     }
 }
-module.exports = { uploadPfp, phone, getuserDetails, updateName, changeEmail };
+
+async function updatePassword(req, res) {
+    try {
+        const user = await userModel.findOneAndUpdate({
+            _id: req.user.id
+        }, {
+            password: await bcrypt.hash(req.body.password, 10)
+        }, { new: true }).select("-password")
+        return res.status(201).json({
+            message: "password updated successfully",
+            user
+        })
+    }
+    catch (error) {
+        console.log("password not updated.\n", error);
+        return res.status(500).json({
+            message: "password not updated",
+            error
+        })
+    }
+}
+
+module.exports = { uploadPfp, phone, getuserDetails, updateName, changeEmail, updatePassword };
