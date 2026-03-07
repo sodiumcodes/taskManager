@@ -3,34 +3,64 @@ const userModel = require('../../models/user.model');
 const taskModel = require('../../models/task.model');
 const uploadPfp = async (req, res) => {
     try {
-        async function uploadFile(buffer) {
+
+        if (!req.file) {
+            return res.status(400).json({
+                message: "No file uploaded"
+            });
+        }
+
+        // Upload file to ImageKit
+        const uploadFile = async (buffer) => {
             const response = await client.files.upload({
-                file: buffer.toString('base64'),
-                fileName: 'image.jpg',
+                file: buffer.toString("base64"),
+                fileName: `profile_${Date.now()}.jpg`,
                 folder: "/taskManager/users"
             });
+
             return response;
+        };
+
+        const currentUser = await userModel.findById(req.user.id);
+
+        // Delete old profile picture if exists
+        if (currentUser.profile_picture?.fileId) {
+            try {
+                await client.files.delete(currentUser.profile_picture.fileId);
+            } catch (err) {
+                console.log("Old image deletion failed:", err.message);
+            }
         }
+
+        // Upload new image
         const image = await uploadFile(req.file.buffer);
 
-        const user = await userModel.findOneAndUpdate({
-            _id: req.user.id
-        }, {
-            profile_picture: image.url,
-        })
+        // Update user
+        const updatedUser = await userModel.findByIdAndUpdate(
+            req.user.id,
+            {
+                profile_picture: {
+                    url: image.url,
+                    fileId: image.fileId
+                }
+            },
+            { new: true }
+        );
+
         return res.status(201).json({
-            message: "picture uploaded successfully",
-            user
-        })
+            message: "Profile picture uploaded successfully",
+            user: updatedUser
+        });
 
     } catch (error) {
-        console.log("Image not uploaded.\n", error);
+        console.log("Image not uploaded:", error);
+
         return res.status(500).json({
-            message: "Image not uploaded",
-            error
-        })
+            message: "Image upload failed",
+            error: error.message
+        });
     }
-}
+};
 const phone = async (req, res) => {
     try {
         const user = await userModel.findOneAndUpdate({
@@ -104,4 +134,25 @@ async function updateName(req, res) {
         })
     }
 }
-module.exports = { uploadPfp, phone, getuserDetails, updateName };
+
+async function changeEmail(req, res) {
+    try {
+        const user = await userModel.findOneAndUpdate({
+            _id: req.user.id
+        }, {
+            email: req.body.email
+        }, { new: true }).select("-password")
+        return res.status(201).json({
+            message: "email updated successfully",
+            user
+        })
+    }
+    catch (error) {
+        console.log("email not updated.\n", error);
+        return res.status(500).json({
+            message: "email not updated",
+            error
+        })
+    }
+}
+module.exports = { uploadPfp, phone, getuserDetails, updateName, changeEmail };
